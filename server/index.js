@@ -34,10 +34,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-connectDB().then(() => {
-  if (!process.env.VERCEL) {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: "Database connection failed" });
   }
 });
+
+if (!process.env.VERCEL) {
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  });
+}
 
 module.exports = app;
