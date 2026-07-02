@@ -11,7 +11,14 @@ const adminRoutes = require("./routes/admin.js");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+const allowedOrigins = ["http://localhost:5173", ...(process.env.CLIENT_URL || "").split(",").map(s => s.trim()).filter(Boolean)];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) return cb(null, true);
+    cb(null, true);
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
