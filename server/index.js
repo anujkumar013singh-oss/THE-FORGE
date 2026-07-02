@@ -15,6 +15,7 @@ app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", creden
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => res.json({ app: "THE FORGE API", status: "running" }));
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
