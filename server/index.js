@@ -25,6 +25,15 @@ app.use(cookieParser());
 app.get("/", (req, res) => res.json({ app: "THE FORGE API", status: "running" }));
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ message: "Database connection failed" });
+  }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
@@ -32,15 +41,6 @@ app.use("/api/admin", adminRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal server error" });
-});
-
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (err) {
-    res.status(500).json({ message: "Database connection failed" });
-  }
 });
 
 if (!process.env.VERCEL) {
